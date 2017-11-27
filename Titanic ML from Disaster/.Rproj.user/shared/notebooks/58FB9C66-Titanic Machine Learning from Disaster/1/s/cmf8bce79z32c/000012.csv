@@ -1,0 +1,2 @@
+"0","counts <- table(raw_data$Sex)"
+"0","barplot(counts)"
