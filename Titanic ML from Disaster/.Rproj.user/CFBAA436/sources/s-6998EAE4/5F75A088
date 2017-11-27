@@ -1,0 +1,24 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1511803574924.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1472241606",
+    "id" : "5F75A088",
+    "lastKnownWriteTime" : 1511803620,
+    "last_content_update" : 1511803620321,
+    "path" : "~/GitHub/DataMiningNotebooks/Titanic ML from Disaster/Titanic Machine Learning from Disaster.Rmd",
+    "project_path" : "Titanic Machine Learning from Disaster.Rmd",
+    "properties" : {
+        "chunk_output_type" : "inline",
+        "cursorPosition" : "3,0",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}
