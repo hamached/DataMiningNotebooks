@@ -1,0 +1,23 @@
+---
+title: "Edmonton Bylaw Infractions Analysisk"
+output: html_notebook
+---
+
+```{r}
+#Libraries
+library("ggplot2")
+library("ggthemes")
+
+
+
+data <- read.csv("./Data/Bylaw_Infractions.csv", header = T)
+names(data)
+View(data)
+```
+
+```{r}
+SummaryOfYearTotal <- aggregate(data$COUNT, by = list(data$YEAR, data$COMPLAINT), sum)
+colnames(SummaryOfYearTotal) <- c("YEAR", "COMPLAINT", "Total")
+ggplot() + geom_line(aes(x = SummaryOfYearTotal$YEAR , y = SummaryOfYearTotal$Total, colour = SummaryOfYearTotal$COMPLAINT)) + theme(legend.position = "bottom", legend.title = element_blank()) + labs(x = "Year", y = "Observations") + ggtitle("Total Complaints by Year and Complaint Type")
+```
+
