@@ -1,2 +1,0 @@
-"0","raw_data <- read.csv(""./Data/test.csv"", header = T)"
-"0","head(raw_data)"

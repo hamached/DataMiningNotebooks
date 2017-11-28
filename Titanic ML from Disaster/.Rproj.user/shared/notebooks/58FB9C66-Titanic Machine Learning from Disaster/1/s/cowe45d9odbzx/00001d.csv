@@ -1,0 +1,4 @@
+"0","trainData$FamilyClass[trainData$familySize == 1] <- 'Single'"
+"0","trainData$FamilyClass[trainData$familySize > 1 & trainData$familySize < 4] <- 'Small'"
+"0","trainData$FamilyClass[trainData$familySize >= 4] <- 'Large'"
+"0","ggplot(trainData, aes(x = FamilyClass, fill = factor(Survived))) + geom_bar(stat = 'Count', position = 'dodge') + labs(x = 'Family Size') + ylab('Observations') + theme_few()"

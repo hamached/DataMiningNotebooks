@@ -1,0 +1,4 @@
+"0","```r
+classCount <- table(raw_data$Pclass)
+barplot(classCount)
+```"
