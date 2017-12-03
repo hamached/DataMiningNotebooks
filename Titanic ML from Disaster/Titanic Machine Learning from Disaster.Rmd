@@ -55,55 +55,136 @@ Variable Notes
   Child = daughter, son, stepdaughter, stepson
   Some children travelled only with a nanny, therefore parch=0 for them.
   
-Summary of the Test Data
-------------------------
+Load Libraries and Data
+-----------------------
 
 ```{r}
 # Libraries
 library("ggplot2")
 library("ggthemes")
 
-
-
-testData <- read.csv("./Data/test.csv", header = T)
-trainData <- read.csv("./Data/train.csv", header = T)
-summary(trainData)
-
+#testData <- read.csv("./Data/test.csv", header = T)
+factTable <- read.csv("./Data/train.csv", header = T)
 ```
 
-Add new Variable based on their age.
+Segmentation
+------------
 
+My interest in in the probablitiy of survival based on passenger attributes. Passenger attributes which may influence the probablity of survival is age, sex, the class they were seated in, family size, and port of departure.
+
+The intent is to use this information for Information Gain(IG)
 ```{r}
-trainData$AdultFlag[trainData$Age <= 18 & trainData$Age > 0] <- 0
-trainData$AdultFlag[trainData$Age > 18] <- 1
-trainData$AdultFlag[is.na(trainData$Age)] <- -1
 
-counts <- table(trainData$AdultFlag)
-barplot(counts, main = "Passengers classified by Age", names.arg = c('Missing Value', 'Children', 'Adults'), col = "darkgreen")
+# Begin Segmentation of population
+factTable$AgeGroup[factTable$Age <= 18] <- 'CHILD'
+factTable$AgeGroup[factTable$Age > 18 & factTable$Age < 65] <- 'ADULT'
+factTable$AgeGroup[factTable$Age >= 65] <- 'SENIOR'
+
+factTable$FSize <- factTable$SibSp + factTable$Parch + 1
+factTable$FamilySize[factTable$FSize == 1] <- 'SINGLE'
+factTable$FamilySize[factTable$FSize > 1 & factTable$FSize <= 4] <- 'SMALL'
+factTable$FamilySize[factTable$FSize > 4 & factTable$FSize <= 6] <- 'MEDIUM'
+factTable$FamilySize[factTable$FSize > 6] <- 'LARGE'
+
+# Calculate percentage survived for each age group {Child, Adult, Senior}
+children <- length(which(factTable$AgeGroup == 'CHILD'))
+survived <- length(which(factTable$AgeGroup == 'CHILD' & factTable$Survived == 1))
+rate <- 1/survived
+
+factTable$PercentageSurvivedByAgeGroup[factTable$AgeGroup == 'CHILD'] <- rate
+rm(children)
+
+seniors <- length(which(factTable$AgeGroup == 'SENIOR'))
+survived <- length(which(factTable$AgeGroup == 'SENIOR' & factTable$Survived == 1))
+rate <- 1/survived
+factTable$PercentageSurvivedByAgeGroup[factTable$AgeGroup == 'SENIOR'] <- rate
+rm(seniors)
+
+adults <- length(which(factTable$AgeGroup == 'ADULT'))
+survived <- length(which(factTable$AgeGroup == 'ADULT' & factTable$Survived == 1))
+rate <- 1/survived
+factTable$PercentageSurvivedByAgeGroup[factTable$AgeGroup == 'ADULT'] <- rate
+rm(adults)
+
+# Survival rate based on where embarked
+fromC <- length(which(factTable$Embarked == 'C'))
+survived <- length(which(factTable$Embarked == 'C' & factTable$Survived == 1))
+rate <- 1/survived
+factTable$PercentageSurvivedByEmbark[factTable$Embarked == 'C'] <- rate
+rm(fromC)
+
+fromQ <- length(which(factTable$Embarked == 'Q'))
+survived <- length(which(factTable$Embarked == 'Q' & factTable$Survived == 1))
+rate <- 1/survived
+factTable$PercentageSurvivedByEmbark[factTable$Embarked == 'Q'] <- rate
+rm(fromQ)
+
+fromS <- length(which(factTable$Embarked == 'S'))
+survived <- length(which(factTable$Embarked == 'S' & factTable$Survived == 1))
+rate <- 1/survived
+factTable$PercentageSurvivedByEmbark[factTable$Embarked == 'S'] <- rate
+rm(fromS)
+
+# Survival Rate by class {1, 2, 3}
+class1 <- length(which(factTable$Pclass == 1))
+survived <- length(which(factTable$Pclass == 1 & factTable$Survived == 1))
+rate <- 1/survived
+factTable$PercentageSurvivedByClass[factTable$Pclass == 1] <- rate
+rm(class1)
+
+class2 <- length(which(factTable$Pclass == 2))
+survived <- length(which(factTable$Pclass == 2 & factTable$Survived == 1))
+rate <- 1/survived
+factTable$PercentageSurvivedByClass[factTable$Pclass == 2] <- rate
+rm(class2)
+
+class3 <- length(which(factTable$Pclass == 3))
+survived <- length(which(factTable$Pclass == 3 & factTable$Survived == 1))
+rate <- 1/survived
+factTable$PercentageSurvivedByClass[factTable$Pclass == 3] <- rate
+rm(class3)
+
+# Survival Rate by Gender
+female <- length(which(factTable$Sex == 'female'))
+survived <- length(which(factTable$Sex == 'female' & factTable$Survived == 1))
+rate <- 1/survived
+factTable$PercentageSurvivedByGender[factTable$Sex == 'female'] <- rate
+rm(female)
+
+male <- length(which(factTable$Sex == 'male'))
+survived <- length(which(factTable$Sex == 'male' & factTable$Survived == 1))
+rate <- 1/survived
+factTable$PercentageSurvivedByGender[factTable$Sex == 'male'] <- rate
+rm(male)
+
+#Overall Survival
+gen <- length(factTable)
+survived = length(factTable$Survived == 1)
+rate <- 1/survived
+factTable$PercentageSurvivedOverall <- rate
+
+# Entropy Parent set
+p1 <- unique(factTable$PercentageSurvivedOverall)
+p2 <- 1 - p1
+entropy <- -(p1*log2(p1) + p2*log2(p2))
+
+factTable$ParentSetEntropy <- entropy
+
+# Entropy for Family Size
+FamilySet <- na.omit(factTable[!duplicated(factTable$AgeGroup), c('PercentageSurvivedByAgeGroup'), ])
+entropyFamilySize <- -(FamilySet[1]*log2(FamilySet[1]) + FamilySet[2]*log2(FamilySet[2]) + FamilySet[3]*log2(FamilySet[3]))
+factTable$FamilySizeEntropy <- entropyFamilySize
+
+# Remove Objects
+rm(gen)
+rm(survived)
+rm(rate)
+rm(entropy)
+rm(p1)
+rm(p2)
+rm(entropyFamilySize)
+rm(FamilySet)
+
+
+View(factTable)
 ```
-
-```{r}
-trainData$familySize <- trainData$SibSp + trainData$Parch + 1
-ggplot(trainData, aes(x = familySize, fill = factor(Survived)))) + geom_bar(stat = 'Count', position = 'dodge') + scale_x_continuous(breaks=c(1:11)) + labs(x = 'Family Size') + ylab('Observations') + theme_few()
-```
-
-Classify family szie as 'Single', 'Small' (1-3), 'Large' ( > 4)
-```{r}
-trainData$FamilyClass[trainData$familySize == 1] <- 'Single'
-trainData$FamilyClass[trainData$familySize > 1 & trainData$familySize < 4] <- 'Small'
-trainData$FamilyClass[trainData$familySize >= 4] <- 'Large'
-
-ggplot(trainData, aes(x = FamilyClass, fill = factor(Survived))) + geom_bar(stat = 'Count', position = 'dodge') + labs(x = 'Family Size') + ylab('Observations') + theme_few()
-```
-
-
-
-
-
-
-
-
-
-
-
-

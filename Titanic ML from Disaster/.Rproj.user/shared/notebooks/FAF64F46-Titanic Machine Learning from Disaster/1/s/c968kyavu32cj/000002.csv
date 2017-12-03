@@ -1,4 +1,0 @@
-"0","```r
-raw_data <- read.csv(\"./Data/test.csv\", header = T)
-head(raw_data)
-```"

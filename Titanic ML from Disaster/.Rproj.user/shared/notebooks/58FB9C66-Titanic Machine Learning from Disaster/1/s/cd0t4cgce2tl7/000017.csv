@@ -1,2 +1,0 @@
-"0","trainData$familySize <- trainData$SibSp + trainData$Parch + 1"
-"0","ggplot(trainData, aes(x = familySize, fill = factor(Survived)), col(""black"")) + geom_bar(stat = 'Count', position = 'dodge') + scale_x_continuous(breaks=c(1:11)) + labs(x = 'Family Size') + ylab('Observations') + theme_few()"

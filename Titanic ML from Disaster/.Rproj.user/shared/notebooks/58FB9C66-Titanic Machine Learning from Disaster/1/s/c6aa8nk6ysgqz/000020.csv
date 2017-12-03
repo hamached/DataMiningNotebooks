@@ -1,5 +1,0 @@
-"0","trainData$AdultFlag[trainData$Age <= 18 & trainData$Age > 0] <- 0"
-"0","trainData$AdultFlag[trainData$Age > 18] <- 1"
-"0","trainData$AdultFlag[is.na(trainData$Age)] <- -1"
-"0","counts <- table(trainData$AdultFlag)"
-"0","barplot(counts, main = ""Passengers classified by Age"", names.arg = c('Missing Value', 'Children', 'Adults'), col = ""darkgreen"")"

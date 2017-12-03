@@ -1,4 +1,0 @@
-"0","```r
-counts <- table(raw_data$Sex)
-barplot(counts)
-```"
